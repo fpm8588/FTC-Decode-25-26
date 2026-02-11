@@ -20,7 +20,6 @@ public class testTeleOP extends AutonomousBaseV1 {
 
         while (opModeIsActive()) {
 
-
             /** //////////////////////////////////
              ///////////////Driver 1///////////////
              ////////////////////////////////// **/
@@ -38,35 +37,46 @@ public class testTeleOP extends AutonomousBaseV1 {
             /** Scoring System **/
             //The Dozer
             if (gamepad2.right_trigger > 0.1) {
-                spinOne.setPower(1);
-                spinTwo.setPower(-1);
-            } else {
-                spinOne.setPower(0);
-                spinTwo.setPower(0);
+                spinOne.setVelocity(1400);
+                //spinTwo.setVelocity(2800);
             }
-            //The Tazer
-            if (gamepad2.left_bumper) {
-                grab();
+            else if (gamepad2.left_trigger > 0.1) {
+                spinOne.setVelocity(1100);
+                //spinTwo.setVelocity(2800);
             }
-            if (gamepad2.right_bumper) {
-                release();
+            else {
+                spinOne.setVelocity(0);
+                //spinTwo.setVelocity(0);
             }
+
             /** Intake Systems **/
             // The Cloaker
-
-            if (gamepad2.x) {
-                wristR.setPosition(0);
-            }
             if (gamepad2.dpad_left) {
-                wristR.setPosition(1);
+                inOne.setPower(-0.6);
+                inTwo.setPower(0.6);
             }
-            // The Medic
-            if (gamepad2.a) {
-                thePinch.setPosition(0.75);
+            else {
+                inOne.setPower(0);
+                inTwo.setPower(0);
             }
-            if (gamepad2.dpad_down) {
-                thePinch.setPosition(0.5);
+            if (gamepad2.x) {
+                lift.setPosition(1);
             }
+            else if (gamepad2.a) {
+                lift.setPosition(0.5);
+            }
+            else if (gamepad2.b) {
+                lift.setPosition(0);
+            }
+            if(gamepad2.left_bumper) {
+                sortOne.setPosition(1);
+                sortTwo.setPosition(0);
+            }
+            else if (gamepad2.right_bumper) {
+                sortTwo.setPosition(1);
+                sortOne.setPosition(0);
+            }
+
         }
     }
 }

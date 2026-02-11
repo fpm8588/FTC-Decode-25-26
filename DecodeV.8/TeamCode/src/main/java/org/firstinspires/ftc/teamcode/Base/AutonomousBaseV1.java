@@ -8,16 +8,15 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 
-
 public abstract class AutonomousBaseV1 extends RobotHardware {
     //resets drive motor encoders
-
 
     protected void resetEncoders() {
         leftFront.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         leftBack.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         rightFront.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         rightBack.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+
         while (opModeIsActive() && rightFront.getCurrentPosition() > 3 && leftFront.getCurrentPosition() > 3) {
         }
         leftFront.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
@@ -29,14 +28,14 @@ public abstract class AutonomousBaseV1 extends RobotHardware {
     }
 
     //resets encoders in arm
-    protected void resetArmEncoders() {
+    protected void resetShooterEncoders() {
         spinOne.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         spinTwo.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         spinOne.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         spinTwo.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-            ;
+        ;
     }
 
     /**
@@ -78,6 +77,7 @@ public abstract class AutonomousBaseV1 extends RobotHardware {
     protected void drive(double power) {
         setDrivePower(power, power, power, power);
     }
+
     /**
      * drives the robot in a straight line for a given distance
      *
@@ -100,12 +100,15 @@ public abstract class AutonomousBaseV1 extends RobotHardware {
                 right /= Math.max(right, left);
                 left /= Math.max(right, left);
             }
-            setDrivePower(left, left, right, right);
+            setDrivePower(left, right, left, right);
         }
         stopDrive();
         telemetry.addLine("Drove " + inches + " inches to target");
         telemetry.update();
     }
+
+
+
 
     /**
      * moves the robot straight laterally at a given power and distance
@@ -129,7 +132,7 @@ public abstract class AutonomousBaseV1 extends RobotHardware {
 
     protected void strafeTime(double power, double rotations) {
         resetEncoders();
-        setDrivePower(-power, power, power, -power);
+        setDrivePower(power, power, power, power);
         double targetPosition = rotations * ultraplanetary_PPR * DRIVE_GEAR_RATIO;
 
         waitSec(rotations);
@@ -188,6 +191,7 @@ public abstract class AutonomousBaseV1 extends RobotHardware {
         telemetry.addLine("Turned " + degreeTarget + " degrees to target");
         telemetry.update();
     }
+
     ////////////////////////////////////////
     ///////////////arm/////////////////////
     //////////////////////////////////////
@@ -198,11 +202,69 @@ public abstract class AutonomousBaseV1 extends RobotHardware {
      */
     protected void extendArm(int degrees, double power){
 
-
-
-
         telemetry.addLine("Rotated Arm " + degrees + " degrees");
         telemetry.update();
+    }
+    /**
+     * Spins spinOne motor at a given power
+     * @param power speed/direction to spin the motor (-1.0 to 1.0)
+     */
+    protected void activateSpinOne(double power) {
+        spinOne.setPower(power);
+        telemetry.addLine("SpinOne activated at power: " + power);
+        telemetry.update();
+    }
+
+    /**
+     * Stops spinOne motor
+     */
+    protected void deactivateSpinOne() {
+        spinOne.setPower(0);
+        telemetry.addLine("SpinOne deactivated");
+        telemetry.update();
+    }
+
+    /**
+     * Runs spinOne for a specific duration
+     * @param power speed to run the motor
+     * @param seconds how long to run it
+     */
+    protected void runSpinOneForTime(double power, double seconds) {
+        activateSpinOne(power);
+        waitSec(seconds);
+        deactivateSpinOne();
+    }
+
+    /**
+     * Activates intake motors at a given power
+     * @param power speed/direction to run the intake motors (-1.0 to 1.0)
+     */
+    protected void activateIntake(double power) {
+        inOne.setPower(power);
+        inTwo.setPower(power);
+        telemetry.addLine("Intake activated at power: " + power);
+        telemetry.update();
+    }
+
+    /**
+     * Stops intake motors
+     */
+    protected void deactivateIntake() {
+        inOne.setPower(0);
+        inTwo.setPower(0);
+        telemetry.addLine("Intake deactivated");
+        telemetry.update();
+    }
+
+    /**
+     * Runs intake motors for a specific duration
+     * @param power speed to run the motors
+     * @param seconds how long to run them
+     */
+    protected void runIntakeForTime(double power, double seconds) {
+        activateIntake(power);
+        waitSec(seconds);
+        deactivateIntake();
     }
     ///////////////////////////////////
     ///////////////Gyro////////////////
@@ -226,6 +288,4 @@ public abstract class AutonomousBaseV1 extends RobotHardware {
         angles = imu.getRobotOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
         return (int) angles.firstAngle;
     }
-
-
 }
